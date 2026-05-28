@@ -98,24 +98,42 @@ public class GraphicEngine {
     private void updatePhysics() {
         if(!player.onGround) {
             player.velY += player.GRAVITY / 2;
+        }
 
-            if(player.velY > 0.9f) {
-                player.velY = 0.9f;
+        if(player.velY > 0.9f) player.velY = 0.9f;
+        if(player.velY < -0.9f) player.velY = -0.9f;
+        if(player.velX > 0.9f) player.velX = 0.9f;
+        if(player.velX < -0.9f) player.velX = -0.9f;
+
+        float nextY = player.y + player.velY;
+        float nextX = player.x + player.velX;
+
+        int roundedY = Math.round(nextY);
+        int roundedX = Math.round(nextX);
+
+        if(roundedX >= 0 && roundedX < map[0].length) {
+            if(map[player.getGridY()][roundedX] != 0)  {
+                player.velX = 0;
+
+                if(player.velX > 0) {
+                    player.x = roundedX - 1;
+                } else {
+                    player.x = roundedX + 1;
+                }
+            } else {
+                player.x = nextX;
             }
         }
 
-        float nextY = player.y + player.velY;
         int gridX = player.getGridX();
 
-        int footPos = Math.round(nextY);
-
-        if(footPos >= 0 && footPos < map.length) {
-            if(map[footPos][gridX] != 0) {
+        if(roundedY >= 0 && roundedY < map.length) {
+            if(map[roundedY][gridX] != 0) {
                 if(player.velY > 0) {
-                    player.y = footPos - 1;
+                    player.y = roundedY - 1;
                     player.onGround = true;
                 } else if(player.velY < 0) {
-                    player.y = footPos + 1;
+                    player.y = roundedY + 1;
                 }
                 player.velY = 0;
             } else {

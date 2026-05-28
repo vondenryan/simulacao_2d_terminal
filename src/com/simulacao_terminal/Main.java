@@ -48,11 +48,20 @@ public class Main {
 
                 player.velY = player.JUMP_POWER;
             } else if(keyPressed == 'd' || keyPressed == 'D') {
-                //todo Lógica de andar
-                player.x += 1;
+                player.velX += player.ACCELERATION;
             } else if(keyPressed == 'a' || keyPressed == 'A') {
-                //todo Lógica de andar
-                player.x -= 1;
+                player.velX -= player.ACCELERATION;
+            }
+
+            //Calculate Deceleration
+            if(keyPressed == '°' && player.velX != 0) {
+                if(player.velX > 0) {
+                    player.velX -= player.DECELERATION;
+                    if(player.velX < 0) player.velX = 0;
+                } else {
+                    player.velX += player.DECELERATION;
+                    if(player.velX > 0) player.velX = 0;
+                }
             }
 
             try {
