@@ -29,7 +29,10 @@ public class GraphicEngine {
     private String displayConfig[] = {
         " ", //0 - Air
         "\033[32m■\033[0m", //1 - Grass
-        "\033[90m■\033[0m" //2 - Rock
+        "\033[2;90m■\033[0m", //2 - Rock
+        "\033[33m■\033[0m", //3 - Sand
+        "\033[36m~\033[0m", //4 - Water
+        "\033[90m■\033[0m", //5 - Peak Rock
     };
 
     private void mainLoop() {
@@ -71,7 +74,7 @@ public class GraphicEngine {
             frameToRender = frame.toString();
     
             try {
-                Thread.sleep(33);
+                Thread.sleep(gs.getFps());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -88,7 +91,7 @@ public class GraphicEngine {
                 lastFrame = frameToRender;
             }
             try {
-                Thread.sleep(5);
+                Thread.sleep(gs.getFps());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -96,49 +99,56 @@ public class GraphicEngine {
     }
 
     private void updatePhysics() {
-        if(!player.onGround) {
-            player.velY += player.GRAVITY / 2;
-        }
+        int subSteps = 3;
 
-        if(player.velY > 0.9f) player.velY = 0.9f;
-        if(player.velY < -0.9f) player.velY = -0.9f;
-        if(player.velX > 0.9f) player.velX = 0.9f;
-        if(player.velX < -0.9f) player.velX = -0.9f;
-
-        float nextY = player.y + player.velY;
-        float nextX = player.x + player.velX;
-
-        int roundedY = Math.round(nextY);
-        int roundedX = Math.round(nextX);
-
-        if(roundedX >= 0 && roundedX < map[0].length) {
-            if(map[player.getGridY()][roundedX] != 0)  {
-                player.velX = 0;
-
-                if(player.velX > 0) {
-                    player.x = roundedX - 1;
-                } else {
-                    player.x = roundedX + 1;
-                }
-            } else {
-                player.x = nextX;
+        for(int cont = 0; cont < subSteps; cont++) {
+            if(!player.onGround) {
+                player.velY += (player.GRAVITY / 2) / subSteps;
             }
-        }
+    
+            if(player.velY > 1.8f) player.velY = 1.8f;
+            if(player.velY < -1.8f) player.velY = -1.8f;
+            if(player.velX > 1.8f) player.velX = 1.8f;
+            if(player.velX < -1.8f) player.velX = -1.8f;
+            
+            float stepX = player.velX / subSteps;
+            float stepY = player.velY / subSteps;
 
-        int gridX = player.getGridX();
+            float nextY = player.y + stepY;
+            float nextX = player.x + stepX;
+    
+            int roundedY = Math.round(nextY);
+            int roundedX = Math.round(nextX);
 
-        if(roundedY >= 0 && roundedY < map.length) {
-            if(map[roundedY][gridX] != 0) {
-                if(player.velY > 0) {
-                    player.y = roundedY - 1;
-                    player.onGround = true;
-                } else if(player.velY < 0) {
-                    player.y = roundedY + 1;
+            int startX = player.getGridX();
+            int startY = player.getGridY();
+    
+            if(roundedX >= 0 && roundedX < map[0].length) {
+                if(map[startY][roundedX] != 0)  {
+                    if(stepX > 0) {
+                        player.x  = roundedX - 1;
+                    } else if(stepX < 0) {
+                        player.x = roundedX + 1;
+                    }
+                    player.velX = 0;
+                } else {
+                    player.x = nextX;
                 }
-                player.velY = 0;
-            } else {
-                player.y = nextY;
-                player.onGround = false;
+            }
+    
+            if(roundedY >= 0 && roundedY < map.length) {
+                if(map[roundedY][startX] != 0) {
+                    if(player.velY > 0) {
+                        player.y = roundedY - 1;
+                        player.onGround = true;
+                    } else if(player.velY < 0) {
+                        player.y = roundedY + 1;
+                    }
+                    player.velY = 0;
+                } else {
+                    player.y = nextY;
+                    player.onGround = false;
+                }
             }
         }
     }

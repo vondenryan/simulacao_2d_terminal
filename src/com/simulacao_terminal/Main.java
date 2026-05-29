@@ -14,14 +14,14 @@ public class Main {
         
         //Map Generation
         int map[][] = {};
-        map = mapController.generateMap(2000, 7000, 1);
+        map = mapController.generateMap(10000, 10000, 2);
         
         //Player starting
         int pPos[] = mapController.spawnPlayer(map);
         Player player = new Player(pPos[1], pPos[0]);
 
         //GameState starter
-        GameState gameState = new GameState(true);
+        GameState gameState = new GameState(true, 33); //~30 Fps
 
         //Input controller starter
         InputController inputController = new InputController(gameState);
@@ -42,11 +42,12 @@ public class Main {
             }
 
             if(keyPressed == 'w' || keyPressed == 'W' || keyPressed == ' ') {
-                // if(player.onGround) {
-                //     player.velY = player.JUMP_POWER;
-                // }
+                int playerX = player.getGridX();
+                int playerY = player.getGridY();
 
-                player.velY = player.JUMP_POWER;
+                if(map[playerY + 1][playerX] != 0) {
+                    player.velY = player.JUMP_POWER;
+                }
             } else if(keyPressed == 'd' || keyPressed == 'D') {
                 player.velX += player.ACCELERATION;
             } else if(keyPressed == 'a' || keyPressed == 'A') {
@@ -56,16 +57,26 @@ public class Main {
             //Calculate Deceleration
             if(keyPressed == '°' && player.velX != 0) {
                 if(player.velX > 0) {
-                    player.velX -= player.DECELERATION;
-                    if(player.velX < 0) player.velX = 0;
+                    if(!player.onGround) {
+                        player.velX -= player.DECELERATION / 2.5;
+                        if(player.velX < 0) player.velX = 0;
+                    } else {
+                        player.velX -= player.DECELERATION;
+                        if(player.velX < 0) player.velX = 0;
+                    }
                 } else {
-                    player.velX += player.DECELERATION;
-                    if(player.velX > 0) player.velX = 0;
+                    if(!player.onGround) {
+                        player.velX += player.DECELERATION / 2.5;
+                        if(player.velX > 0) player.velX = 0;
+                    } else {
+                        player.velX += player.DECELERATION;
+                        if(player.velX > 0) player.velX = 0;
+                    }
                 }
             }
 
             try {
-                Thread.sleep(33);
+                Thread.sleep(gameState.getFps());
             } catch (Exception e) {
                 e.printStackTrace();
             }

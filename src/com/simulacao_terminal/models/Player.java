@@ -9,8 +9,8 @@ public class Player {
 
     public final float GRAVITY = 0.2f;
     public final float JUMP_POWER = -0.9f;
-    public final float ACCELERATION = 0.4f;
-    public final float DECELERATION = 0.2f;
+    public final float ACCELERATION = 0.9f;
+    public final float DECELERATION = 0.4f;
 
     public boolean onGround = true;
 
