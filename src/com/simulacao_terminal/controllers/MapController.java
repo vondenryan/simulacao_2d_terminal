@@ -45,36 +45,37 @@ public class MapController {
     }
 
     private int[][] naturalGeneration(int m[][]) {
-        float scale = 0.04f;
-
-        float heightOffsetX = (float) (Math.random() * 10000);
-        float heightOffsetY = (float) (Math.random() * 10000);
-
-        float moistureOffsetX = (float) (Math.random() * 10000) + 5000;
-        float moistureOffsetY = (float) (Math.random() * 10000) + 5000;
-
-        for(int y = 0; y < m.length; y++) {
-            for(int x = 0; x < m[y].length; x++) {
-                float hX = (x * scale) + heightOffsetX;
-                float hY = (y * scale * 2.0f) + heightOffsetY;
-                float heightValue = (PerlinNoise.noise(hX, hY) + 1.0f) / 2.0f;
-
-                float mX = (x * (scale * 0.8f)) + moistureOffsetX;
-                float mY = (y * (scale * 0.8f) * 2.0f) + moistureOffsetY;
-                float moistureValue = (PerlinNoise.noise(mX, mY) + 1.0f) / 2.0f;
+        float surfaceScale = 0.02f;
+        float caveScale = 0.05f; // Controls cave size/frequency
+        
+        double offsetX = Math.random() * 300;
+        double offsetY = Math.random() * 300;
+    
+        for (int y = 0; y < m.length; y++) {
+            for (int x = 0; x < m[y].length; x++) {
                 
-                if(heightValue < 0.40f) {
-                    m[y][x] = 0;
-                } else if(heightValue < 0.75f) {
-                    m[y][x] = 5;
-                } else {
-                    if(moistureValue < 0.35f) {
-                        m[y][x] = 3;
-                    } else if(moistureValue < 0.70f) {
-                        m[y][x] = 1;
-                    } else {
-                        m[y][x] = 2;
+                double surfaceNoise = PerlinNoise.noise((float)(offsetX + (x * surfaceScale)), 0.6f);
+                int groundLevel = m.length / 2 + (int)(surfaceNoise * 8);
+    
+                if (y > groundLevel) {
+                    float cX = (float)(offsetX + (x * caveScale));
+                    float cY = (float)(offsetY + (y * caveScale * 2.0f));
+                    float caveNoise = (PerlinNoise.noise(cX, cY) + 1.0f) / 2.0f;
+    
+                    if (y > groundLevel + 2 && caveNoise > 0.68f) {
+                        m[y][x] = 0; // Cave air
+                    } 
+                    else {
+                        if (y == groundLevel + 1) {
+                            m[y][x] = 1; // Grass surface
+                        } else if (y <= groundLevel + 5) {
+                            m[y][x] = 2; // Shallow Dirt layer
+                        } else {
+                            m[y][x] = 4; // Deep Stone layer
+                        }
                     }
+                } else {
+                    m[y][x] = 0; // Sky Air
                 }
             }
         }
@@ -84,33 +85,23 @@ public class MapController {
     //! Player WorldPos Controller Methods
 
     public int[] spawnPlayer(int m[][]) {
-        int minY = 1;
-        int maxY = m.length - 1;
-
         int minX = 1;
         int maxX = m[0].length - 1;
-
-        boolean sucessfullyPlaced = false;
-
-        int y = 0, x = 0;
-        int attempts = 0;
-
-        while (!sucessfullyPlaced) {
-            y = random.nextInt((maxY - minY) + 1) + minY;
-            x = random.nextInt((maxX - minX) + 1) + minX;
-            attempts++;
-            
-            if(m[y][x] == 0) {
-                if(m[y + 1][x] >= 1 && m[y + 1][x] <= 5) {
-                    sucessfullyPlaced = true;
-                }
-            }
-
-            if(attempts >= 2000 && m[y][x] == 0) {
-                sucessfullyPlaced = true;
+        int x = random.nextInt((maxX - minX) + 1) + minX;
+    
+        int y = 0;
+    
+        for (int row = 0; row < m.length - 1; row++) {
+            if (m[row][x] == 0 && m[row + 1][x] != 0) {
+                y = row;
+                break;
             }
         }
-
+    
+        if (y == 0) {
+            y = m.length / 2;
+        }
+    
         return new int[] {y, x};
     }
 }

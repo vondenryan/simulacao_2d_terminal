@@ -29,10 +29,11 @@ public class GraphicEngine {
     private String displayConfig[] = {
         " ", //0 - Air
         "\033[32m■\033[0m", //1 - Grass
-        "\033[2;90m■\033[0m", //2 - Rock
-        "\033[33m■\033[0m", //3 - Sand
-        "\033[36m~\033[0m", //4 - Water
-        "\033[90m■\033[0m", //5 - Peak Rock
+        "\033[38;5;130m■\033[0m", //2 - Dirt
+        "\033[90m■\033[0m", //3 - Peak Rock
+        "\033[2;90m■\033[0m", //4 - Peak Rock
+        "\033[33m■\033[0m", //5 - Sand
+        "\033[36m~\033[0m", //6 - Water
     };
 
     private void mainLoop() {

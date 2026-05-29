@@ -14,7 +14,7 @@ public class Main {
         
         //Map Generation
         int map[][] = {};
-        map = mapController.generateMap(10000, 10000, 2);
+        map = mapController.generateMap(2000, 10000, 2);
         
         //Player starting
         int pPos[] = mapController.spawnPlayer(map);
