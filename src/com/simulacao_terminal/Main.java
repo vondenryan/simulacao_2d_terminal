@@ -2,6 +2,7 @@ package com.simulacao_terminal;
 
 import com.simulacao_terminal.controllers.InputController;
 import com.simulacao_terminal.controllers.MapController;
+import com.simulacao_terminal.services.InputService;
 import com.simulacao_terminal.engine.GraphicEngine;
 import com.simulacao_terminal.models.GameState;
 import com.simulacao_terminal.models.Player;
@@ -14,7 +15,7 @@ public class Main {
         
         //Map Generation
         int map[][] = {};
-        map = mapController.generateMap(2000, 10000, 2);
+        map = mapController.generateMap(10000, 50000, 2);
         
         //Player starting
         int pPos[] = mapController.spawnPlayer(map);
@@ -33,53 +34,7 @@ public class Main {
         renderer.start();
 
         //Input processor
-        while (gameState.isRunning()) {
-            char keyPressed = '°';
-
-            synchronized (gameState) {
-                keyPressed = gameState.lastInput;
-                gameState.lastInput = '°';
-            }
-
-            if(keyPressed == 'w' || keyPressed == 'W' || keyPressed == ' ') {
-                int playerX = player.getGridX();
-                int playerY = player.getGridY();
-
-                if(map[playerY + 1][playerX] != 0) {
-                    player.velY = player.JUMP_POWER;
-                }
-            } else if(keyPressed == 'd' || keyPressed == 'D') {
-                player.velX += player.ACCELERATION;
-            } else if(keyPressed == 'a' || keyPressed == 'A') {
-                player.velX -= player.ACCELERATION;
-            }
-
-            //Calculate Deceleration
-            if(keyPressed == '°' && player.velX != 0) {
-                if(player.velX > 0) {
-                    if(!player.onGround) {
-                        player.velX -= player.DECELERATION / 2.5;
-                        if(player.velX < 0) player.velX = 0;
-                    } else {
-                        player.velX -= player.DECELERATION;
-                        if(player.velX < 0) player.velX = 0;
-                    }
-                } else {
-                    if(!player.onGround) {
-                        player.velX += player.DECELERATION / 2.5;
-                        if(player.velX > 0) player.velX = 0;
-                    } else {
-                        player.velX += player.DECELERATION;
-                        if(player.velX > 0) player.velX = 0;
-                    }
-                }
-            }
-
-            try {
-                Thread.sleep(gameState.getFps());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        InputService inputService = new InputService(gameState, player, map);
+        inputService.start();
     }
 }
