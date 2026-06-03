@@ -16,7 +16,7 @@ Get ready to dive into a dynamic 2D world where you can watch simulations unfold
 
 The simulation creates a living, breathing world rendered directly in your terminal:
 
-- **Generated Worlds**: Each time you play, the terrain is procedurally generated, creating unique landscapes with grass, dirt, stone, sand, and water.
+- **Generated Worlds**: Each time you play, the terrain is procedurally generated, creating unique landscapes with grass, dirt and stone.
 - **Real-Time Physics**: Experience gravity, momentum, and collision detection as you move through the world. Your character responds naturally to the environment.
 - **Interactive Gameplay**: Control your character with keyboard inputs and watch as the world updates in real-time, frame by frame.
 - **Dynamic Rendering**: The terminal continuously refreshes to display the current state of the world, creating smooth animation and an immersive experience.
