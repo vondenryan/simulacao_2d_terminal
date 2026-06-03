@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PerlinNoise - 2D Terminal Simulation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        h3 { margin-top: 20px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .param { margin-left: 20px; }
+        .return { margin-left: 20px; }
+        .see { margin-left: 20px; color: #666; }
+        .note { background: #e3f2fd; padding: 10px; border-radius: 3px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <h1>PerlinNoise</h1>
+    <p><strong>Package:</strong> <code>com.simulacao_terminal.utils</code></p>
+    <p><strong>Description:</strong> Implementation of Perlin noise algorithm for generating smooth random terrain. Used by MapController for natural terrain generation with caves.</p>
+
+    <h2>Overview</h2>
+    <p>This is a standard Perlin noise implementation that generates coherent noise values for smooth terrain. Perlin noise creates values that vary smoothly, making it ideal for generating natural-looking terrain features.</p>
+
+    <h2>Algorithm Overview</h2>
+    <p>The algorithm works by:</p>
+    <ol>
+        <li>Computing a gradient vector at each lattice point</li>
+        <li>Computing a dot product with the distance from lattice point to query point</li>
+        <li>Smoothing the contributions using a fade function</li>
+        <li>Linearly interpolating between adjacent lattice values</li>
+    </ol>
+
+    <h2>Static Fields</h2>
+    <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>p</code></td><td><code>int[512]</code></td><td>Padded permutation table for noise generation</td></tr>
+        <tr><td><code>permutation</code></td><td><code>int[256]</code></td><td>Original permutation values</td></tr>
+    </table>
+    <p>The permutation table is padded with duplicate values to avoid modulo operations during noise calculation.</p>
+
+    <h2>Methods</h2>
+
+    <h3>noise(float x, float y)</h3>
+    <p><strong>Description:</strong> Computes 2D Perlin noise for the given coordinates.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>x</td><td><code>float</code></td><td>X coordinate in noise space</td></tr>
+        <tr><td>y</td><td><code>float</code></td><td>Y coordinate in noise space</td></tr>
+    </table>
+    <p><strong>Returns:</strong> <code>float</code> - Noise value in range [-1.0, 1.0]</p>
+
+    <h3>fade(float t)</h3>
+    <p><strong>Description:</strong> Smooth interpolation curve (fade function). Returns 0 for t=0 and 1 for t=1, with zero derivatives at both ends.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>t</td><td><code>float</code></td><td>Input value between 0 and 1</td></tr>
+    </table>
+    <p><strong>Returns:</strong> <code>float</code> - Smoothed value</p>
+    <p><strong>Formula:</strong> <code>t * t * t * (t * (t * 6 - 15) + 10)</code></p>
+
+    <h3>lerp(float t, float a, float b)</h3>
+    <p><strong>Description:</strong> Linear interpolation between two values.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>t</td><td><code>float</code></td><td>Interpolation factor (0 = a, 1 = b)</td></tr>
+        <tr><td>a</td><td><code>float</code></td><td>Start value</td></tr>
+        <tr><td>b</td><td><code>float</code></td><td>End value</td></tr>
+    </table>
+    <p><strong>Returns:</strong> <code>float</code> - Interpolated value: <code>a + t * (b - a)</code></p>
+
+    <h3>grad(int hash, float x, float y)</h3>
+    <p><strong>Description:</strong> Computes gradient dot product for a lattice point.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>hash</td><td><code>int</code></td><td>Hash value from permutation table</td></tr>
+        <tr><td>x</td><td><code>float</code></td><td>X distance from lattice point</td></tr>
+        <tr><td>y</td><td><code>float</code></td><td>Y distance from lattice point</td></tr>
+    </table>
+    <p><strong>Returns:</strong> <code>float</code> - Dot product of gradient and distance</p>
+
+    <h2>Usage in MapController</h2>
+    <pre><code>// Surface height generation
+float surfaceScale = 0.02f;
+double offsetX = Math.random() * 300;
+double offsetY = Math.random() * 300;
+
+int groundLevel = mapHeight / 2 + (int)(PerlinNoise.noise(
+    (float)(offsetX + (x * surfaceScale)),
+    0.6f
+) * 8);
+
+// Cave generation
+float caveScale = 0.05f;
+float caveNoise = (PerlinNoise.noise(cX, cY) + 1.0f) / 2.0f;
+if (caveNoise > 0.68f) {
+    m[y][x] = 0;  // Cave air
+}</code></pre>
+
+    <h2>Scale Parameters</h2>
+    <table>
+        <tr><th>Parameter</th><th>Value</th><th>Effect</th></tr>
+        <tr><td><code>surfaceScale</code></td><td><code>0.02f</code></td><td>Controls terrain height variation frequency</td></tr>
+        <tr><td><code>caveScale</code></td><td><code>0.05f</code></td><td>Controls cave size and frequency</td></tr>
+    </table>
+    <p>Smaller scale values = larger features, larger scale values = smaller features.</p>
+
+    <h2>Range Mapping</h2>
+    <p>The noise function returns [-1, 1]. Common mappings:</p>
+    <table>
+        <tr><th>Use Case</th><th>Mapping</th><th>Result Range</th></tr>
+        <tr><td>Ground level</td><td><code>(noise + 1) * 8</code></td><td>[0, 16]</td></tr>
+        <tr><td>Cave threshold</td><td><code>(noise + 1) / 2</code></td><td>[0, 1]</td></tr>
+    </table>
+
+    <div class="note">
+        <strong>Note:</strong> This is a deterministic implementation - same coordinates always produce the same noise value. Random offsets (offsetX, offsetY) provide variety across game sessions.
+    </div>
+
+    <h2>See Also</h2>
+    <ul class="see">
+        <li><code>MapController</code> - Uses this for terrain generation</li>
+        <li><code>PerlinNoise</code> - Perlin noise algorithm reference</li>
+    </ul>
+</body>
+</html>

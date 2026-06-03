@@ -15,14 +15,14 @@ public class Main {
         
         //Map Generation
         int map[][] = {};
-        map = mapController.generateMap(10000, 50000, 2);
+        map = mapController.generateMap(1000, 5000, 2);
         
         //Player starting
         int pPos[] = mapController.spawnPlayer(map);
         Player player = new Player(pPos[1], pPos[0]);
 
         //GameState starter
-        GameState gameState = new GameState(true, 33); //~30 Fps
+        GameState gameState = new GameState(true); //~30 Fps
 
         //Input controller starter
         InputController inputController = new InputController(gameState);

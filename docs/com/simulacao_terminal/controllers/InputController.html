@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InputController - 2D Terminal Simulation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        h3 { margin-top: 20px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .param { margin-left: 20px; }
+        .return { margin-left: 20px; }
+        .see { margin-left: 20px; color: #666; }
+        .note { background: #e3f2fd; padding: 10px; border-radius: 3px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <h1>InputController</h1>
+    <p><strong>Package:</strong> <code>com.simulacao_terminal.controllers</code></p>
+    <p><strong>Description:</strong> Handles keyboard input using JLine terminal library. Runs in a separate thread and stores input in GameState.</p>
+
+    <h2>Overview</h2>
+    <p>InputController uses JLine's <code>TerminalBuilder</code> to capture raw keyboard input without requiring Enter to be pressed. It runs continuously while the game is running and stores each keystroke in the shared GameState.</p>
+
+    <h2>Constructor</h2>
+    <h3>InputController(GameState gameState)</h3>
+    <p><strong>Description:</strong> Initializes the input controller with a reference to the game state.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>gameState</td><td><code>GameState</code></td><td>The shared game state object where input will be stored</td></tr>
+    </table>
+
+    <h2>Methods</h2>
+
+    <h3>start()</h3>
+    <p><strong>Description:</strong> Starts the input reading thread. This method returns immediately while input continues to be read in the background.</p>
+    <p><strong>Thread Safety:</strong> The input is written to GameState with proper synchronization using <code>synchronized (gs)</code> blocks.</p>
+
+    <h3>readInputs()</h3>
+    <p><strong>Description:</strong> Main input reading loop. Reads keystrokes from the terminal and stores them in GameState.</p>
+    <p><strong>Behavior:</strong></p>
+    <ul>
+        <li>Continues while <code>running == true</code> and <code>gameState.isRunning() == true</code></li>
+        <li>Reads keystrokes one at a time using <code>reader.read()</code></li>
+        <li>Converts integer code to char for storage</li>
+        <li>Escape key (27) sets running to false and exits</li>
+        <li>All other keystrokes are stored in GameState.lastInput</li>
+    </ul>
+
+    <h3>restoreTerminal()</h3>
+    <p><strong>Description:</strong> Restores the terminal to normal mode on shutdown. Called automatically when the input thread exits.</p>
+
+    <h2>Keyboard Input Mapping</h2>
+    <table>
+        <tr><th>Key</th><th>Value</th><th>Handler</th></tr>
+        <tr><td>Escape</td><td><code>27</code></td><td>Quits the game</td></tr>
+        <tr><td>W / ↑</td><td><code>'w'</code> or <code>'W'</code></td><td><code>InputService</code> - Jump</td></tr>
+        <tr><td>A / ←</td><td><code>'a'</code> or <code>'A'</code></td><td><code>InputService</code> - Move Left</td></tr>
+        <tr><td>D / →</td><td><code>'d'</code> or <code>'D'</code></td><td><code>InputService</code> - Move Right</td></tr>
+        <tr><td>Space</td><td><code>' '</code></td><td><code>InputService</code> - Jump</td></tr>
+    </table>
+
+    <div class="note">
+        <strong>Note:</strong> The <code>lastInput</code> field in GameState is declared <code>volatile</code> to ensure visibility across threads. The input controller synchronizes writes, and InputService synchronizes reads.
+    </div>
+
+    <h2>Exception Handling</h2>
+    <p>The input reader catches all exceptions and prints the stack trace. The terminal is always restored in the <code>finally</code> block.</p>
+
+    <h2>See Also</h2>
+    <ul class="see">
+        <li><code>GameState</code> - Shared state with volatile lastInput field</li>
+        <li><code>InputService</code> - Reads from GameState and processes input</li>
+        <li><code>org.jline.terminal.TerminalBuilder</code> - JLine library for raw terminal input</li>
+    </ul>
+</body>
+</html>

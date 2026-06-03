@@ -1,14 +1,24 @@
 package com.simulacao_terminal.controllers;
 
+import com.simulacao_terminal.utils.PerlinNoise;
 import java.util.Random;
 import java.util.Scanner;
 
-import com.simulacao_terminal.utils.PerlinNoise;
-
+/**
+ * Terrain generation with Perlin noise and player spawning.
+*/
 public class MapController {
     static Scanner in = new Scanner(System.in);
     static Random random = new Random();
 
+    /**
+     * Organizes the map generation logic
+     * 
+     * @param y                 Number of rows (height) in the map
+     * @param x                 Number of columns (width) in the map
+     * @param generationType    1 = flat, 2 = natural with Perlin noise
+     * @return                  2D array representing the terrain map
+     */
     public int[][] generateMap(int y, int x, int generationType) {
         int map[][] = new int[y][x];
 
@@ -28,6 +38,13 @@ public class MapController {
     }
 
     //! Generation Types
+
+    /**
+     * Generates a terrain map with the specified dimensions and generation type.
+     * 
+     * @param m     Map matrix
+     * @return      2D array representing the terrain map
+    */
     private int[][] flatMap(int m[][]) {
         for(int lin = 0; lin < m.length; lin++) {
             for(int col = 0; col < m[lin].length; col++) {
@@ -44,10 +61,17 @@ public class MapController {
         return m;
     }
 
+    /**
+     * Generates a terrain map with the specified dimensions and generation type.
+     *
+     * @param m     Map matrix
+     * @return      2D array representing the terrain map
+    */
     private int[][] naturalGeneration(int m[][]) {
         float surfaceScale = 0.02f;
         float caveScale = 0.05f; // Controls cave size/frequency
         
+        //todo Make offset seed based either than random based
         double offsetX = Math.random() * 300;
         double offsetY = Math.random() * 300;
     
@@ -62,20 +86,24 @@ public class MapController {
                     float cY = (float)(offsetY + (y * caveScale * 2.0f));
                     float caveNoise = (PerlinNoise.noise(cX, cY) + 1.0f) / 2.0f;
     
-                    if (y > groundLevel + 2 && caveNoise > 0.68f) {
+                    if (y > groundLevel + 15 && caveNoise > 0.68f) {
                         m[y][x] = 0; // Cave air
                     } 
                     else {
                         if (y == groundLevel + 1) {
-                            m[y][x] = 1; // Grass surface
+                            // Grass surface
+                            m[y][x] = 1;
                         } else if (y <= groundLevel + 5) {
-                            m[y][x] = 2; // Shallow Dirt layer
+                            // Shallow Dirt layer
+                            m[y][x] = 2;
                         } else {
-                            m[y][x] = 4; // Deep Stone layer
+                            // Deep Stone layer
+                            m[y][x] = 4;
                         }
                     }
                 } else {
-                    m[y][x] = 0; // Sky Air
+                    // Sky Air
+                    m[y][x] = 0;
                 }
             }
         }
@@ -84,6 +112,12 @@ public class MapController {
 
     //! Player WorldPos Controller Methods
 
+    /**
+     * Finds a valid spawn position for the player on the terrain surface.
+     * 
+     * @param m     The generated terrain map
+     * @return      Array with [y, x] coordinates for player spawn
+     */
     public int[] spawnPlayer(int m[][]) {
         int minX = 1;
         int maxX = m[0].length - 1;

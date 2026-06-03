@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main - 2D Terminal Simulation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        h3 { margin-top: 20px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .param { margin-left: 20px; }
+        .return { margin-left: 20px; }
+        .see { margin-left: 20px; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>Main Class</h1>
+    <p><strong>Package:</strong> <code>com.simulacao_terminal</code></p>
+    <p><strong>Description:</strong> Entry point of the 2D terminal simulation. Initializes and starts all game components including the map, player, input controller, and rendering engine.</p>
+
+    <h2>Overview</h2>
+    <p>The <code>Main</code> class orchestrates the game startup process by:</p>
+    <ul>
+        <li>Creating a <code>MapController</code> to generate terrain</li>
+        <li>Generating the world map with procedural terrain</li>
+        <li>Spawning the player at a valid position</li>
+        <li>Starting the <code>InputController</code> for keyboard handling</li>
+        <li>Starting the <code>GraphicEngine</code> for rendering</li>
+        <li>Starting the <code>InputService</code> for input processing</li>
+    </ul>
+
+    <h2>Game Loop</h2>
+    <p>The game runs three concurrent threads:</p>
+    <ol>
+        <li><strong>Input Controller Thread</strong> - Reads keyboard input and stores in GameState</li>
+        <li><strong>Graphic Engine Thread</strong> - Renders the game state to terminal</li>
+        <li><strong>Input Service Thread</strong> - Processes input and updates player physics</li>
+    </ol>
+
+    <h2>Example Usage</h2>
+    <pre><code>public static void main(String[] args) throws Exception {
+    MapController mapController = new MapController();
+    Utils utils = new Utils();
+
+    // Generate terrain map
+    int map[][] = mapController.generateMap(10000, 50000, 2);
+
+    // Spawn player at valid position
+    int pPos[] = mapController.spawnPlayer(map);
+    Player player = new Player(pPos[1], pPos[0]);
+
+    // Initialize game state
+    GameState gameState = new GameState(true);
+
+    // Start all systems
+    InputController inputController = new InputController(gameState);
+    inputController.start();
+
+    GraphicEngine renderer = new GraphicEngine(map, player, gameState);
+    utils.clearConsole();
+    renderer.start();
+
+    InputService inputService = new InputService(gameState, player, map);
+    inputService.start();
+}</code></pre>
+
+    <h2>Map Generation Types</h2>
+    <table>
+        <tr><th>Type</th><th>Description</th></tr>
+        <tr><td><code>1</code></td><td>Flat map - simple terrain at mid-height</td></tr>
+        <tr><td><code>2</code></td><td>Natural generation - Perlin noise terrain with caves</td></tr>
+    </table>
+
+    <h2>See Also</h2>
+    <ul class="see">
+        <li><code>InputController</code> - Keyboard input handling</li>
+        <li><code>GraphicEngine</code> - Rendering system</li>
+        <li><code>InputService</code> - Input-to-physics processing</li>
+        <li><code>MapController</code> - Terrain generation</li>
+        <li><code>GameState</code> - Game state management</li>
+        <li><code>Player</code> - Player entity</li>
+    </ul>
+</body>
+</html>
