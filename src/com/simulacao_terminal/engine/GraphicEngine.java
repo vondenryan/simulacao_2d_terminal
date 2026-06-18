@@ -1,5 +1,6 @@
 package com.simulacao_terminal.engine;
 
+import com.simulacao_terminal.controllers.MapController;
 import com.simulacao_terminal.models.GameState;
 import com.simulacao_terminal.models.Player;
 import com.simulacao_terminal.utils.Utils;
@@ -8,11 +9,11 @@ public class GraphicEngine {
     private Utils utils = new Utils();
     private volatile String frameToRender = "";
 
-    private int map[][];
+    private MapController map;
     private Player player;
     private GameState gs;
 
-    public GraphicEngine(int map[][], Player player, GameState gs) {
+    public GraphicEngine(MapController map, Player player, GameState gs) {
         this.map = map;
         this.player = player;
         this.gs = gs;
@@ -48,10 +49,10 @@ public class GraphicEngine {
             int lenghtVisionRange = 90;
             
             int leftSide = Math.max(0, pX - lenghtVisionRange);
-            int rightSide = Math.min(map[0].length, pX + lenghtVisionRange);
+            int rightSide = Math.min(map.getMapWidth(), pX + lenghtVisionRange);
             
             int topSide = Math.max(0, pY - heightVisionRange);
-            int bottomSide = Math.min(map.length, pY + heightVisionRange);
+            int bottomSide = Math.min(map.getMapHeight(), pY + heightVisionRange);
             
             StringBuilder frame = new StringBuilder();
     
@@ -60,7 +61,7 @@ public class GraphicEngine {
                     if(col == player.getGridX() && lin == player.getGridY()) {
                         frame.append("\033[31mO\033[0m");
                     } else {
-                        int blockVal = map[lin][col];
+                        int blockVal = map.getPointValue(lin, col);
 
                         if(blockVal < 0 || blockVal >= displayConfig.length) {
                             frame.append("\033[35m?\033[0m");
@@ -125,8 +126,8 @@ public class GraphicEngine {
             int startX = player.getGridX();
             int startY = player.getGridY();
     
-            if(roundedX >= 0 && roundedX < map[0].length) {
-                if(map[startY][roundedX] != 0)  {
+            if(roundedX >= 0 && roundedX < map.getMapWidth()) {
+                if(map.getPointValue(startY, roundedX) != 0)  {
                     if(stepX > 0) {
                         player.x  = roundedX - 1;
                     } else if(stepX < 0) {
@@ -138,8 +139,8 @@ public class GraphicEngine {
                 }
             }
     
-            if(roundedY >= 0 && roundedY < map.length) {
-                if(map[roundedY][startX] != 0) {
+            if(roundedY >= 0 && roundedY < map.getMapHeight()) {
+                if(map.getPointValue(roundedY, startX) != 0) {
                     if(player.velY > 0) {
                         player.y = roundedY - 1;
                         player.onGround = true;

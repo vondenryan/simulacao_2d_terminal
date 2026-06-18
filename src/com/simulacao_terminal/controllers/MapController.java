@@ -102,6 +102,10 @@ public class MapController {
         return new int[] {y, x};
     }
 
+    public int getPointValue(int y, int x) {
+        return map[y][x];
+    }
+
     public int[][] getMap() {
         return map;
     }

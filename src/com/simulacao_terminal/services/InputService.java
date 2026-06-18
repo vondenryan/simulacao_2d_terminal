@@ -1,25 +1,26 @@
 package com.simulacao_terminal.services;
 
+import com.simulacao_terminal.controllers.MapController;
 import com.simulacao_terminal.models.GameState;
 import com.simulacao_terminal.models.Player;
 
 public class InputService {
     private GameState gameState;
     private Player player;
-    private int map[][];
+    private MapController map;
 
-    public InputService(GameState gameState, Player player, int map[][]) {
+    public InputService(GameState gameState, Player player, MapController map) {
         this.gameState = gameState;
         this.player = player;
         this.map = map;
     }
 
     public void start() {
-        Thread inputLoopThread = new Thread(this::inputProcessingLoop);
+        Thread inputLoopThread = new Thread(this::keyboardLoop);
         inputLoopThread.start();
     }
 
-    private void inputProcessingLoop() {
+    private void keyboardLoop() {
         while(gameState.isRunning()) {
             char keyPressed = '°';
 
@@ -32,7 +33,7 @@ public class InputService {
                 int playerX = player.getGridX();
                 int playerY = player.getGridY();
 
-                if(map[playerY + 1][playerX] != 0) {
+                if(map.getPointValue(playerY + 1, playerX) != 0) {
                     player.velY = player.JUMP_POWER;
                 }
             } else if(keyPressed == 'd' || keyPressed == 'D') {
