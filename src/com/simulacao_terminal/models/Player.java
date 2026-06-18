@@ -3,7 +3,7 @@ package com.simulacao_terminal.models;
 public class Player {
     public float x;
     public float y;
-
+    
     public float velY = 0f;
     public float velX = 0f;
 

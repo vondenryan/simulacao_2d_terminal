@@ -10,15 +10,13 @@ import com.simulacao_terminal.utils.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        MapController mapController = new MapController();
         Utils utils = new Utils();
         
         //Map Generation
-        int map[][] = {};
-        map = mapController.generateMap(1000, 5000, 2);
+        MapController map = new MapController(2000, 2000, "natural");
         
         //Player starting
-        int pPos[] = mapController.spawnPlayer(map);
+        int pPos[] = map.spawnPlayer();
         Player player = new Player(pPos[1], pPos[0]);
 
         //GameState starter
