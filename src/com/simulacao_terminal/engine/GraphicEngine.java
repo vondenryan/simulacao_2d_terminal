@@ -42,14 +42,18 @@ public class GraphicEngine {
 
     private void mainLoop() {
         while(gs.isRunning()) {
-            int pY = player.getGridY();
-            int pX = player.getGridX();
+            int pY, pX;
+
+            synchronized(player) {
+                pY = player.getGridY();
+                pX = player.getGridX();
+            }
             
             int heightVisionRange = 25;
-            int lenghtVisionRange = 90;
+            int lengthVisionRange = 90;
             
-            int leftSide = Math.max(0, pX - lenghtVisionRange);
-            int rightSide = Math.min(map.getMapWidth(), pX + lenghtVisionRange);
+            int leftSide = Math.max(0, pX - lengthVisionRange);
+            int rightSide = Math.min(map.getMapWidth(), pX + lengthVisionRange);
             
             int topSide = Math.max(0, pY - heightVisionRange);
             int bottomSide = Math.min(map.getMapHeight(), pY + heightVisionRange);
@@ -104,54 +108,64 @@ public class GraphicEngine {
     private void physicsLoop() {
         int subSteps = 3;
 
-        for(int cont = 0; cont < subSteps; cont++) {
-            if(!player.onGround) {
-                player.velY += (player.GRAVITY / 2) / subSteps;
-            }
-    
-            if(player.velY > 1.8f) player.velY = 1.8f;
-            if(player.velY < -1.8f) player.velY = -1.8f;
-            if(player.velX > 1.8f) player.velX = 1.8f;
-            if(player.velX < -1.8f) player.velX = -1.8f;
+        while(gs.isRunning()) {
+            synchronized(player) {
+                for(int cont = 0; cont < subSteps; cont++) {
+                    if(!player.onGround) {
+                        player.velY += (player.GRAVITY / 2) / subSteps;
+                    }
             
-            float stepX = player.velX / subSteps;
-            float stepY = player.velY / subSteps;
-
-            float nextY = player.y + stepY;
-            float nextX = player.x + stepX;
-    
-            int roundedY = Math.round(nextY);
-            int roundedX = Math.round(nextX);
-
-            int startX = player.getGridX();
-            int startY = player.getGridY();
-    
-            if(roundedX >= 0 && roundedX < map.getMapWidth()) {
-                if(map.getPointValue(startY, roundedX) != 0)  {
-                    if(stepX > 0) {
-                        player.x  = roundedX - 1;
-                    } else if(stepX < 0) {
-                        player.x = roundedX + 1;
+                    if(player.velY > 1.8f) player.velY = 1.8f;
+                    if(player.velY < -1.8f) player.velY = -1.8f;
+                    if(player.velX > 1.8f) player.velX = 1.8f;
+                    if(player.velX < -1.8f) player.velX = -1.8f;
+                    
+                    float stepX = player.velX / subSteps;
+                    float stepY = player.velY / subSteps;
+        
+                    float nextY = player.y + stepY;
+                    float nextX = player.x + stepX;
+            
+                    int roundedY = Math.round(nextY);
+                    int roundedX = Math.round(nextX);
+        
+                    int startX = player.getGridX();
+                    int startY = player.getGridY();
+            
+                    if(roundedX >= 0 && roundedX < map.getMapWidth()) {
+                        if(map.getPointValue(startY, roundedX) != 0)  {
+                            if(stepX > 0) {
+                                player.x  = roundedX - 1;
+                            } else if(stepX < 0) {
+                                player.x = roundedX + 1;
+                            }
+                            player.velX = 0;
+                        } else {
+                            player.x = nextX;
+                        }
                     }
-                    player.velX = 0;
-                } else {
-                    player.x = nextX;
+            
+                    if(roundedY >= 0 && roundedY < map.getMapHeight()) {
+                        if(map.getPointValue(roundedY, startX) != 0) {
+                            if(player.velY > 0) {
+                                player.y = roundedY - 1;
+                                player.onGround = true;
+                            } else if(player.velY < 0) {
+                                player.y = roundedY + 1;
+                            }
+                            player.velY = 0;
+                        } else {
+                            player.y = nextY;
+                            player.onGround = false;
+                        }
+                    }
                 }
             }
-    
-            if(roundedY >= 0 && roundedY < map.getMapHeight()) {
-                if(map.getPointValue(roundedY, startX) != 0) {
-                    if(player.velY > 0) {
-                        player.y = roundedY - 1;
-                        player.onGround = true;
-                    } else if(player.velY < 0) {
-                        player.y = roundedY + 1;
-                    }
-                    player.velY = 0;
-                } else {
-                    player.y = nextY;
-                    player.onGround = false;
-                }
+
+            try {
+                Thread.sleep(gs.getFps());
+            } catch(InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
     }
