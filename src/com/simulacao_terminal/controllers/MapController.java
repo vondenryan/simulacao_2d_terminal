@@ -81,22 +81,22 @@ public class MapController {
         }
     }
 
-    public int[] spawnPlayer(int m[][]) {
+    public int[] spawnPlayer() {
         int minX = 1;
-        int maxX = m[0].length - 1;
+        int maxX = map[0].length - 1;
         int x = random.nextInt((maxX - minX) + 1) + minX;
     
         int y = 0;
     
-        for (int row = 0; row < m.length - 1; row++) {
-            if (m[row][x] == 0 && m[row + 1][x] != 0) {
+        for (int row = 0; row < map.length - 1; row++) {
+            if (map[row][x] == 0 && map[row + 1][x] != 0) {
                 y = row;
                 break;
             }
         }
     
         if (y == 0) {
-            y = m.length / 2;
+            y = map.length / 2;
         }
     
         return new int[] {y, x};
