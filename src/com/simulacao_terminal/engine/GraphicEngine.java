@@ -24,6 +24,9 @@ public class GraphicEngine {
         
         Thread gameLoopThread = new Thread(this::mainLoop);
         gameLoopThread.start();
+
+        Thread physicsLoopThread = new Thread(this::physicsLoop);
+        physicsLoopThread.start();
     }
 
     private String displayConfig[] = {
@@ -38,8 +41,6 @@ public class GraphicEngine {
 
     private void mainLoop() {
         while(gs.isRunning()) {
-            updatePhysics();
-            
             int pY = player.getGridY();
             int pX = player.getGridX();
             
@@ -99,7 +100,7 @@ public class GraphicEngine {
         }
     }
 
-    private void updatePhysics() {
+    private void physicsLoop() {
         int subSteps = 3;
 
         for(int cont = 0; cont < subSteps; cont++) {
