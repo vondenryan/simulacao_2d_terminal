@@ -49,6 +49,7 @@ public class MapController {
         float caveScale = 0.025f; // Controls cave size/frequency
         
         //todo Make offset seed based either than random based
+        //todo Make offset seed based either than random based
         double offsetX = Math.random() * 300;
         double offsetY = Math.random() * 300;
     
