@@ -1,72 +1,43 @@
 # 2D Game Simulation in Terminal
 
-A 2D game simulation rendered directly in the terminal, built with Java. This project demonstrates game development concepts including entity management, collision detection, and real-time rendering in a command-line environment.
+Welcome to this interactive 2D game simulation that runs right in your terminal! 
 
-## Features
+## About This Project
 
-- **2D Game Simulation**: Real-time simulation of game entities and interactions
-- **Terminal Rendering**: Display graphics and animations directly in the terminal
-- **Entity Management**: Handle multiple game objects and their behaviors
-- **Interactive**: Keyboard-controlled gameplay and interactions
+This is a fun experiment in creating an engaging gaming experience within the constraints of a terminal environment. It brings classic 2D gameplay to life using text-based graphics and real-time interactions.
 
-## Requirements
+Whether you're a casual player looking for a quick distraction or a retro gaming enthusiast, this project offers a unique way to experience gaming in its purest form—no fancy graphics libraries needed, just pure terminal-based entertainment.
 
-- Java 8 or higher
-- Terminal/Command Line Interface
+## What to Expect
 
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/vondenryan/simulacao_2d_terminal.git
-cd simulacao_2d_terminal
-```
-
-2. Compile the Java source files:
-```bash
-javac -d bin src/**/*.java
-```
-
-3. Run the simulation:
-```bash
-java -cp bin com.simulation.Main
-```
-
-## Usage
-
-[Add instructions on how to interact with the simulation, control schemes, and game objectives]
-
-## Project Structure
-
-```
-simulacao_2d_terminal/
-├── src/
-│   └── [Java source files]
-├── bin/
-│   └── [Compiled Java bytecode]
-└── README.md
-```
+Get ready to dive into a dynamic 2D world where you can watch simulations unfold or actively participate in the action. The terminal becomes your playground for exploration and engagement. Navigate through procedurally generated terrain, interact with the environment, and experience physics-based gameplay all within your terminal window.
 
 ## How It Works
 
-This project implements a 2D game simulation where:
-- Entities are managed and updated each frame
-- The terminal is cleared and redrawn to show the current state
-- Collision detection and physics may be applied
-- User input is processed to control game behavior
+The simulation creates a living, breathing world rendered directly in your terminal:
 
-## Contributing
+- **Generated Worlds**: Each time you play, the terrain is procedurally generated, creating unique landscapes with grass, dirt and stone.
+- **Real-Time Physics**: Experience gravity, momentum, and collision detection as you move through the world. Your character responds naturally to the environment.
+- **Interactive Gameplay**: Control your character with keyboard inputs and watch as the world updates in real-time, frame by frame.
+- **Dynamic Rendering**: The terminal continuously refreshes to display the current state of the world, creating smooth animation and an immersive experience.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## Getting Started
 
-## License
+Simply run the application and jump into the simulation. The experience is designed to be intuitive and enjoyable right out of the box.
 
-This project is open source and available under the MIT License.
+### Controls
 
-## Author
+| Key | Action |
+|-----|--------|
+| `W` / `↑` / `Space` | Jump |
+| `A` / `←` | Move Left |
+| `D` / `→` | Move Right |
+| `ESC` | Quit |
 
-- [vondenryan](https://github.com/vondenryan)
+## Have Fun!
+
+Enjoy the game and the unique charm of terminal-based entertainment. This project is all about having a good time while exploring what's possible in a terminal environment.
 
 ---
 
-**Note**: For detailed technical documentation, please explore the source code files in the `src/` directory.
+*Created with Java to bring terminal gaming to life.*

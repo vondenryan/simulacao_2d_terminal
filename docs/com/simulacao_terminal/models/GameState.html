@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameState - 2D Terminal Simulation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        h3 { margin-top: 20px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .param { margin-left: 20px; }
+        .return { margin-left: 20px; }
+        .see { margin-left: 20px; color: #666; }
+        .note { background: #e3f2fd; padding: 10px; border-radius: 3px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <h1>GameState</h1>
+    <p><strong>Package:</strong> <code>com.simulacao_terminal.models</code></p>
+    <p><strong>Description:</strong> Holds shared game state including running status and last input. Designed for thread-safe access between InputController and InputService.</p>
+
+    <h2>Overview</h2>
+    <p>GameState acts as a communication channel between different game threads. It stores the global running state and the last keystroke received from the user.</p>
+
+    <h2>Constructor</h2>
+    <h3>GameState(boolean running)</h3>
+    <p><strong>Description:</strong> Initializes the game state with a running status.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>running</td><td><code>boolean</code></td><td>Initial running state (true = game active)</td></tr>
+    </table>
+
+    <h2>Fields</h2>
+    <table>
+        <tr><th>Field</th><th>Type</th><th>Access</th><th>Description</th></tr>
+        <tr><td><code>lastInput</code></td><td><code>volatile char</code></td><td>Public</td><td>Last keystroke received. Declared volatile for visibility across threads.</td></tr>
+        <tr><td><code>target_fps</code></td><td><code>private int</code></td><td>Private</td><td>Target frames per second (30)</td></tr>
+        <tr><td><code>frame_time</code></td><td><code>private int</code></td><td>Private</td><td>Milliseconds per frame (1000/30 ≈ 33ms)</td></tr>
+        <tr><td><code>fps</code></td><td><code>private int</code></td><td>Private</td><td>Current FPS value - currently unused</td></tr>
+    </table>
+
+    <div class="note">
+        <strong>Thread Safety:</strong> The <code>lastInput</code> field is declared <code>volatile</code> to ensure that changes made by InputController are immediately visible to InputService. All writes use <code>synchronized (gs)</code> blocks, and reads use <code>synchronized(gameState)</code> blocks.
+    </div>
+
+    <h2>Methods</h2>
+
+    <h3>isRunning()</h3>
+    <p><strong>Description:</strong> Returns whether the game should continue running.</p>
+    <p><strong>Returns:</strong> <code>boolean</code> - true if game is running, false to quit</p>
+
+    <h3>setRunning(boolean running)</h3>
+    <p><strong>Description:</strong> Sets the running state. Set to false to quit the game.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>running</td><td><code>boolean</code></td><td>New running state</td></tr>
+    </table>
+
+    <h3>getFps()</h3>
+    <p><strong>Description:</strong> Returns the current FPS value (milliseconds per frame).</p>
+    <p><strong>Returns:</strong> <code>int</code> - Current FPS value</p>
+
+    <h3>setFps(int fps)</h3>
+    <p><strong>Description:</strong> Sets the FPS value (milliseconds per frame).</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>fps</td><td><code>int</code></td><td>New FPS value in milliseconds</td></tr>
+    </table>
+
+    <h2>Usage Pattern</h2>
+    <pre><code>// In InputController (writer thread):
+synchronized (gs) {
+    gs.lastInput = c;
+}
+
+// In InputService (reader thread):
+synchronized (gameState) {
+    keyPressed = gameState.lastInput;
+    gameState.lastInput = '\0';  // Clear after reading
+}</code></pre>
+
+    <h2>See Also</h2>
+    <ul class="see">
+        <li><code>InputController</code> - Writes to lastInput</li>
+        <li><code>InputService</code> - Reads from lastInput</li>
+        <li><code>GraphicEngine</code> - Uses isRunning() for loop control</li>
+    </ul>
+</body>
+</html>

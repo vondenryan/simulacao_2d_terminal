@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphicEngine - 2D Terminal Simulation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        h3 { margin-top: 20px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .param { margin-left: 20px; }
+        .return { margin-left: 20px; }
+        .see { margin-left: 20px; color: #666; }
+        .note { background: #e3f2fd; padding: 10px; border-radius: 3px; margin: 15px 0; }
+        .table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>GraphicEngine</h1>
+    <p><strong>Package:</strong> <code>com.simulacao_terminal.engine</code></p>
+    <p><strong>Description:</strong> Handles rendering the game to the terminal and physics simulation. Runs two threads: one for physics updates and one for rendering.</p>
+
+    <h2>Overview</h2>
+    <p>GraphicEngine is the core of the game loop. It manages:
+    <ul>
+        <li>Rendering the map and player to terminal with ANSI colors</li>
+        <li>Physics simulation with collision detection</li>
+        <li>Camera/tracking the player position</li>
+    </ul></p>
+
+    <h2>Constructor</h2>
+    <h3>GraphicEngine(int[][] map, Player player, GameState gameState)</h3>
+    <p><strong>Description:</strong> Initializes the rendering engine with game objects.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>map</td><td><code>int[][]</code></td><td>The terrain map to render</td></tr>
+        <tr><td>player</td><td><code>Player</code></td><td>The player entity to track and render</td></tr>
+        <tr><td>gameState</td><td><code>GameState</code></td><td>Shared game state for loop control</td></tr>
+    </table>
+
+    <h2>Methods</h2>
+
+    <h3>start()</h3>
+    <p><strong>Description:</strong> Starts both the render thread and physics thread. Returns immediately.</p>
+
+    <h3>renderLoop()</h3>
+    <p><strong>Description:</strong> Main rendering thread. Outputs the current frame to terminal.</p>
+    <p><strong>Behavior:</strong></p>
+    <ol>
+        <li>Waits for frameToRender to update</li>
+        <li>Compares with lastFrame to avoid duplicate output</li>
+        <li>Resets terminal cursor position</li>
+        <li>Prints current frame</li>
+        <li>Sleeps for frame_time milliseconds</li>
+    </ol>
+    <p><strong>Optimization:</strong> Only renders when frameToRender changes, avoiding unnecessary console output.</p>
+
+    <h3>mainLoop()</h3>
+    <p><strong>Description:</strong> Main physics update thread. Calls updatePhysics() and builds the render frame.</p>
+    <p><strong>Behavior:</strong></p>
+    <ol>
+        <li>Runs while gameState.isRunning() is true</li>
+        <li>Updates player physics</li>
+        <li>Calculates visible viewport around player</li>
+        <li>Builds frame string with block rendering</li>
+        <li>Sets frameToRender for renderLoop</li>
+        <li>Sleeps for frame_time milliseconds</li>
+    </ol>
+
+    <h3>updatePhysics()</h3>
+    <p><strong>Description:</strong> Updates player position with sub-stepping for accurate collision detection.</p>
+    <p><strong>Sub-stepping:</strong> 3 sub-steps per frame for smoother physics</p>
+    <p><strong>Physics Order:</strong></p>
+    <ol>
+        <li><strong>Gravity:</strong> velY += GRAVITY / subSteps</li>
+        <li><strong>Velocity Clamping:</strong> clamp to [-1.8, +1.8]</li>
+        <li><strong>X Movement:</strong> Apply stepX, check collision</li>
+        <li><strong>Y Movement:</strong> Apply stepY, check collision</li>
+        <li><strong>Collision Response:</strong> Stop velocity, adjust position</li>
+    </ol>
+
+    <h2>Rendering</h2>
+
+    <h3>Viewport</h3>
+    <table>
+        <tr><th>Dimension</th><th>Range</th></tr>
+        <tr><td>Height</td><td>25 blocks (±12 from player)</td></tr>
+        <tr><td>Width</td><td>90 blocks (±45 from player)</td></tr>
+    </table>
+    <p>Only blocks within viewport are rendered.</p>
+
+    <h3>Block Colors</h3>
+    <table class="table-wrap">
+        <tr><th>Value</th><th>Block</th><th>ANSI Code</th><th>Appearance</th></tr>
+        <tr><td>0</td><td>Air</td><td><code>" "</code></td><td>Transparent</td></tr>
+        <tr><td>1</td><td>Grass</td><td><code>\033[32m</code></td><td>Green box</td></tr>
+        <tr><td>2</td><td>Dirt</td><td><code>\033[38;5;130m</code></td><td>Brown box</td></tr>
+        <tr><td>3</td><td>Peak Rock</td><td><code>\033[90m</code></td><td>Dark gray box</td></tr>
+        <tr><td>4</td><td>Peak Rock</td><td><code>\033[2;90m</code></td><td>Dim dark gray</td></tr>
+        <tr><td>5</td><td>Sand</td><td><code>\033[33m</code></td><td>Yellow box</td></tr>
+        <tr><td>6</td><td>Water</td><td><code>\033[36m~</code></td><td>Cyan tilde</td></tr>
+        <tr><td>Player</td><td>O</td><td><code>\033[31m</code></td><td>Red circle</td></tr>
+        <tr><td>Invalid</td><td>?</td><td><code>\033[35m</code></td><td>Purple question</td></tr>
+    </table>
+
+    <h3>Frame Building</h3>
+    <pre><code>StringBuilder frame = new StringBuilder();
+for (int lin = topSide; lin < bottomSide; lin++) {
+    for (int col = leftSide; col < rightSide; col++) {
+        if (col == playerX && lin == playerY) {
+            frame.append("\033[31mO\033[0m");  // Player
+        } else {
+            int blockVal = map[lin][col];
+            frame.append(displayConfig[blockVal]);  // Block color
+        }
+    }
+    frame.append("\n");  // Newline for each row
+}</code></pre>
+
+    <h2>Double Buffering</h2>
+    <pre><code>private volatile String frameToRender = "";  // Write buffer
+// renderLoop reads from frameToRender</code></pre>
+    <p>Uses volatile to ensure frameToRender updates are immediately visible to renderLoop.</p>
+
+    <div class="note">
+        <strong>Threading Note:</strong> The current implementation runs physics and rendering in separate threads but modifies the player object directly. Consider adding synchronization if InputService also modifies player directly.
+    </div>
+
+    <h2>See Also</h2>
+    <ul class="see">
+        <li><code>InputService</code> - Modifies player physics</li>
+        <li><code>Utils</code> - Console clearing and positioning</li>
+        <li><code>GameState</code> - Loop control via isRunning()</li>
+    </ul>
+</body>
+</html>

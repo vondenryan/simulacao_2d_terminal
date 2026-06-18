@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InputService - 2D Terminal Simulation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        h3 { margin-top: 20px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .param { margin-left: 20px; }
+        .return { margin-left: 20px; }
+        .see { margin-left: 20px; color: #666; }
+        .note { background: #e3f2fd; padding: 10px; border-radius: 3px; margin: 15px 0; }
+        .table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>InputService</h1>
+    <p><strong>Package:</strong> <code>com.simulacao_terminal.services</code></p>
+    <p><strong>Description:</strong> Processes keyboard input from GameState and applies it to Player physics. Runs in a separate thread and works with GraphicEngine to move the player.</p>
+
+    <h2>Overview</h2>
+    <p>InputService reads keystrokes from GameState and translates them into player movement. It handles jumping, horizontal movement, and deceleration.</p>
+
+    <h2>Constructor</h2>
+    <h3>InputService(GameState gameState, Player player, int[][] map)</h3>
+    <p><strong>Description:</strong> Initializes the input service with references to game state, player, and map.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>gameState</td><td><code>GameState</code></td><td>Shared game state with input queue</td></tr>
+        <tr><td>player</td><td><code>Player</code></td><td>Player entity to control</td></tr>
+        <tr><td>map</td><td><code>int[][]</code></td><td>Map for collision detection</td></tr>
+    </table>
+
+    <h2>Methods</h2>
+
+    <h3>start()</h3>
+    <p><strong>Description:</strong> Starts the input processing thread. Returns immediately.</p>
+
+    <h3>inputProcessingLoop()</h3>
+    <p><strong>Description:</strong> Main loop that reads input from GameState and updates player physics.</p>
+    <p><strong>Behavior:</strong></p>
+    <ol>
+        <li>Reads lastInput from GameState with synchronization</li>
+        <li>Clears lastInput in GameState</li>
+        <li>Processes key based on value</li>
+        <li>Updates player velocity</li>
+        <li>Handles deceleration when no input</li>
+        <li>Waits for frame time before next iteration</li>
+    </ol>
+
+    <h2>Input Key Mappings</h2>
+    <table class="table-wrap">
+        <tr><th>Key</th><th>Action</th><th>Effect on Player</th></tr>
+        <tr><td><code>'w'</code>, <code>'W'</code>, <code>' '</code></td><td>Jump</td><td>Sets velY to JUMP_POWER (-0.9) if on ground</td></tr>
+        <tr><td><code>'d'</code>, <code>'D'</code></td><td>Move Right</td><td>Adds ACCELERATION (0.9) to velX</td></tr>
+        <tr><td><code>'a'</code>, <code>'A'</code></td><td>Move Left</td><td>Subtracts ACCELERATION (0.9) from velX</td></tr>
+        <tr><td><code>'°'</code> (null)</td><td>No Input</td><td>Applies DECELERATION to velX</td></tr>
+    </table>
+
+    <h2>Deceleration Logic</h2>
+    <p>When no key is pressed, the player slows down based on whether they are in the air or on ground:</p>
+    <table>
+        <tr><th>Condition</th><th>Deceleration</th></tr>
+        <tr><td>Airborne</td><td><code>DECELERATION / 2.5 = 0.16</code></td></tr>
+        <tr><td>On ground</td><td><code>DECELERATION = 0.4</code></td></tr>
+    </table>
+    <p>Ground deceleration is higher, making movement snappier when on terrain.</p>
+
+    <h2>Velocity Clamping</h2>
+    <p>InputService sets velocity directly. GraphicEngine clamps final velocities to [-1.8, +1.8].</p>
+
+    <h2>Thread Synchronization</h2>
+    <pre><code>// Writes from InputController:
+synchronized (gs) {
+    gs.lastInput = c;
+}
+
+// Reads in InputService:
+synchronized (gameState) {
+    keyPressed = gameState.lastInput;
+    gameState.lastInput = '\0';
+}</code></pre>
+
+    <div class="note">
+        <strong>Thread Safety:</strong> Both InputController and InputService synchronize on the same GameState object, ensuring safe concurrent access to lastInput.
+    </div>
+
+    <h2>Frame Timing</h2>
+    <p>The loop sleeps for <code>gameState.getFps()</code> milliseconds each iteration, typically 33ms for 30 FPS.</p>
+
+    <h2>See Also</h2>
+    <ul class="see">
+        <li><code>GameState</code> - Reads input from here</li>
+        <li><code>InputController</code> - Writes input to GameState</li>
+        <li><code>Player</code> - Modifies player velocity</li>
+        <li><code>GraphicEngine</code> - Applies physics and collision</li>
+    </ul>
+</body>
+</html>

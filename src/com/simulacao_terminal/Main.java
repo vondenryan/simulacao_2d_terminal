@@ -20,7 +20,7 @@ public class Main {
         Player player = new Player(pPos[1], pPos[0]);
 
         //GameState starter
-        GameState gameState = new GameState(true, 33); //~30 Fps
+        GameState gameState = new GameState(true); //~30 Fps
 
         //Input controller starter
         InputController inputController = new InputController(gameState);

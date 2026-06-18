@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - 2D Terminal Simulation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        .package { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .package h3 { margin-top: 0; }
+        ul { list-style: none; padding-left: 0; }
+        li { margin: 5px 0; }
+        a { color: #1a73e8; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .pkg-controllers { border-left: 4px solid #ff6b6b; }
+        .pkg-models { border-left: 4px solid #4ecdc4; }
+        .pkg-engine { border-left: 4px solid #45b7d1; }
+        .pkg-utils { border-left: 4px solid #96ceb4; }
+        .pkg-main { border-left: 4px solid #ff9f43; }
+        .pkg-services { border-left: 4px solid #6c5ce7; }
+    </style>
+</head>
+<body>
+    <h1>2D Terminal Simulation - Documentation</h1>
+    <p><strong>Version:</strong> 1.0</p>
+    <p><strong>Package:</strong> com.simulacao_terminal</p>
+    <p><strong>Last Updated:</strong> 2026-06-02</p>
+
+    <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #ffeeba;">
+        <strong>Note:</strong> This documentation was auto-generated from Javadoc comments. For complete API details, refer to the source code.
+    </div>
+
+    <h2>Package Structure</h2>
+
+    <div class="package pkg-main">
+        <h3>com.simulacao_terminal (Main Package)</h3>
+        <ul>
+            <li><a href="com/simulacao_terminal/Main.html">Main</a> - Entry point. Initializes and starts all game components.</li>
+        </ul>
+    </div>
+
+    <div class="package pkg-controllers">
+        <h3>com.simulacao_terminal.controllers (Controller Package)</h3>
+        <ul>
+            <li><a href="com/simulacao_terminal/controllers/InputController.html">InputController</a> - Keyboard input handling using JLine. Runs in separate thread.</li>
+            <li><a href="com/simulacao_terminal/controllers/MapController.html">MapController</a> - Terrain generation with Perlin noise and player spawning.</li>
+        </ul>
+    </div>
+
+    <div class="package pkg-models">
+        <h3>com.simulacao_terminal.models (Model Package)</h3>
+        <ul>
+            <li><a href="com/simulacao_terminal/models/GameState.html">GameState</a> - Shared game state including running status and last input.</li>
+            <li><a href="com/simulacao_terminal/models/Player.html">Player</a> - Player entity with position, velocity, and physics properties.</li>
+        </ul>
+    </div>
+
+    <div class="package pkg-services">
+        <h3>com.simulacao_terminal.services (Service Package)</h3>
+        <ul>
+            <li><a href="com/simulacao_terminal/services/InputService.html">InputService</a> - Processes keyboard input and applies physics to player.</li>
+        </ul>
+    </div>
+
+    <div class="package pkg-engine">
+        <h3>com.simulacao_terminal.engine (Engine Package)</h3>
+        <ul>
+            <li><a href="com/simulacao_terminal/engine/GraphicEngine.html">GraphicEngine</a> - Handles rendering and physics simulation. Runs dual threads.</li>
+        </ul>
+    </div>
+
+    <div class="package pkg-utils">
+        <h3>com.simulacao_terminal.utils (Utility Package)</h3>
+        <ul>
+            <li><a href="com/simulacao_terminal/utils/PerlinNoise.html">PerlinNoise</a> - Perlin noise algorithm for terrain generation.</li>
+            <li><a href="com/simulacao_terminal/utils/Utils.html">Utils</a> - Console utility methods (clear, reset position).</li>
+        </ul>
+    </div>
+
+    <h2>Quick Start</h2>
+    <pre><code>public static void main(String[] args) throws Exception {
+    MapController mapController = new MapController();
+    Utils utils = new Utils();
+
+    // Generate terrain
+    int map[][] = mapController.generateMap(10000, 50000, 2);
+
+    // Spawn player
+    int pPos[] = mapController.spawnPlayer(map);
+    Player player = new Player(pPos[1], pPos[0]);
+
+    // Initialize game state
+    GameState gameState = new GameState(true);
+
+    // Start systems
+    InputController inputController = new InputController(gameState);
+    inputController.start();
+
+    GraphicEngine renderer = new GraphicEngine(map, player, gameState);
+    utils.clearConsole();
+    renderer.start();
+
+    InputService inputService = new InputService(gameState, player, map);
+    inputService.start();
+}</code></pre>
+
+    <h2>Controls</h2>
+    <table>
+        <tr><th>Key</th><th>Action</th></tr>
+        <tr><td><code>W</code>, <code>↑</code>, <code>Space</code></td><td>Jump</td></tr>
+        <tr><td><code>A</code>, <code>←</code></td><td>Move Left</td></tr>
+        <tr><td><code>D</code>, <code>→</code></td><td>Move Right</td></tr>
+        <tr><td><code>ESC</code></td><td>Quit Game</td></tr>
+    </table>
+
+    <h2>Map Block Types</h2>
+    <table>
+        <tr><th>Value</th><th>Block</th><th>Color</th></tr>
+        <tr><td>0</td><td>Air</td><td>Transparent</td></tr>
+        <tr><td>1</td><td>Grass</td><td>Green</td></tr>
+        <tr><td>2</td><td>Dirt</td><td>Brown</td></tr>
+        <tr><td>3-4</td><td>Stone</td><td>Gray</td></tr>
+        <tr><td>5</td><td>Sand</td><td>Yellow</td></tr>
+        <tr><td>6</td><td>Water</td><td>Cyan</td></tr>
+    </table>
+
+    <h2>Architecture</h2>
+    <p>The game runs three concurrent threads:</p>
+    <ol>
+        <li><strong>Input Controller</strong> - Reads keyboard, writes to GameState</li>
+        <li><strong>Input Service</strong> - Reads from GameState, modifies Player velocity</li>
+        <li><strong>Graphic Engine</strong> - Updates physics, renders map</li>
+    </ol>
+
+    <h2>See Also</h2>
+    <ul>
+        <li><a href="https://github.com/vondenryan/simulacao_2d_terminal">Project Repository</a></li>
+        <li><a href="IMPROVEMENT_PATH.md">Improvement Checklist</a></li>
+    </ul>
+</body>
+</html>

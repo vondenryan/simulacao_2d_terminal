@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utils - 2D Terminal Simulation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        h3 { margin-top: 20px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .param { margin-left: 20px; }
+        .return { margin-left: 20px; }
+        .see { margin-left: 20px; color: #666; }
+        .note { background: #e3f2fd; padding: 10px; border-radius: 3px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <h1>Utils</h1>
+    <p><strong>Package:</strong> <code>com.simulacao_terminal.utils</code></p>
+    <p><strong>Description:</strong> Utility class for console operations. Provides methods for clearing the screen and resetting cursor position.</p>
+
+    <h2>Overview</h2>
+    <p>Utils contains helper methods for terminal manipulation using ANSI escape codes. These are essential for smooth console rendering in the GraphicEngine.</p>
+
+    <h2>Constructor</h2>
+    <p><code>Utils()</code></p>
+    <p>No-argument constructor. No initialization required.</p>
+
+    <h2>Methods</h2>
+
+    <h3>clearConsole()</h3>
+    <p><strong>Description:</strong> Clears the entire console screen and moves cursor to top-left.</p>
+    <p><strong>ANSI Sequence:</strong> <code>\033[H\033[2J</code></p>
+    <ul>
+        <li><code>\033[H</code> - Move cursor to home position (1,1)</li>
+        <li><code>\033[2J</code> - Clear entire screen</li>
+    </ul>
+    <p><strong>Usage:</strong> Call at game start to clear any previous output.</p>
+    <pre><code>Utils utils = new Utils();
+utils.clearConsole();
+// Game output begins here</code></pre>
+
+    <h3>resetConsolePosition()</h3>
+    <p><strong>Description:</strong> Moves cursor to the top-left of the console without clearing.</p>
+    <p><strong>ANSI Sequence:</strong> <code>\033[H</code></p>
+    <p><strong>Usage:</strong> Call before each frame render to overwrite previous output.</p>
+    <pre><code>utils.resetConsolePosition();
+System.out.print(currentFrame);
+// Previous frame content is replaced</code></pre>
+
+    <h2>ANSI Escape Codes</h2>
+    <table>
+        <tr><th>Code</th><th>Effect</th><th>Use Case</th></tr>
+        <tr><td><code>\033[H</code></td><td>Cursor home</td><td>Reset to (0,0)</td></tr>
+        <tr><td><code>\033[2J</code></td><td>Clear entire screen</td><td>Full clear</td></tr>
+    </table>
+
+    <h2>Platform Compatibility</h2>
+    <p>ANSI escape codes work on:</p>
+    <ul>
+        <li>Linux terminals (all)</li>
+        <li>macOS Terminal (all)</li>
+        <li>Windows 10+ Command Prompt and PowerShell</li>
+        <li>Modern terminal emulators (xterm, gnome-terminal, etc.)</li>
+    </ul>
+    <p>For older Windows versions, consider adding a platform check or using JLine's built-in functionality.</p>
+
+    <div class="note">
+        <strong>Performance Note:</strong> Using <code>System.out.print()</code> directly (not println) with pre-built frame strings minimizes I/O calls and improves rendering performance.
+    </div>
+
+    <h2>See Also</h2>
+    <ul class="see">
+        <li><code>GraphicEngine</code> - Uses these methods for rendering</li>
+        <li><code>Main</code> - Calls clearConsole at startup</li>
+    </ul>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MapController - 2D Terminal Simulation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        h3 { margin-top: 20px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .param { margin-left: 20px; }
+        .return { margin-left: 20px; }
+        .see { margin-left: 20px; color: #666; }
+        .note { background: #e3f2fd; padding: 10px; border-radius: 3px; margin: 15px 0; }
+        .table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>MapController</h1>
+    <p><strong>Package:</strong> <code>com.simulacao_terminal.controllers</code></p>
+    <p><strong>Description:</strong> Handles terrain generation and player spawning. Uses Perlin noise for natural terrain generation with caves.</p>
+
+    <h2>Overview</h2>
+    <p>MapController provides procedural terrain generation with two modes: flat terrain and natural terrain with Perlin noise. It also handles finding valid player spawn positions.</p>
+
+    <h2>Constructor</h2>
+    <p><code>MapController()</code></p>
+    <p>No-argument constructor. No initialization required.</p>
+
+    <h2>Methods</h2>
+
+    <h3>generateMap(int rows, int cols, int generationType)</h3>
+    <p><strong>Description:</strong> Generates a terrain map with the specified dimensions and generation type.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>rows</td><td><code>int</code></td><td>Number of rows (height) in the map</td></tr>
+        <tr><td>cols</td><td><code>int</code></td><td>Number of columns (width) in the map</td></tr>
+        <tr><td>generationType</td><td><code>int</code></td><td>1 = flat, 2 = natural with Perlin noise</td></tr>
+    </table>
+    <p><strong>Returns:</strong> <code>int[][]</code> - 2D array representing the terrain map</p>
+    <p><strong>Throws:</strong> Returns empty array for invalid generation type</p>
+
+    <h3>spawnPlayer(int[][] map)</h3>
+    <p><strong>Description:</strong> Finds a valid spawn position for the player on the terrain surface.</p>
+    <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td>map</td><td><code>int[][]</code></td><td>The generated terrain map</td></tr>
+    </table>
+    <p><strong>Returns:</strong> <code>int[]</code> - Array with [y, x] coordinates for player spawn</p>
+    <p><strong>Algorithm:</strong></p>
+    <ol>
+        <li>Picks a random X position (1 to width-1)</li>
+        <li>Scans downward from top to find terrain surface</li>
+        <li>Spawns on the first air/terrain boundary</li>
+        <li>Falls back to mid-height if no surface found</li>
+    </ol>
+
+    <h2>Map Values</h2>
+    <table class="table-wrap">
+        <tr><th>Value</th><th>Block Type</th><th>Color</th><th>Description</th></tr>
+        <tr><td><code>0</code></td><td>Air</td><td>Transparent</td><td>Empty space - no collision</td></tr>
+        <tr><td><code>1</code></td><td>Grass</td><td>Green</td><td>Surface layer - solid</td></tr>
+        <tr><td><code>2</code></td><td>Dirt</td><td>Brown</td><td>Shallow layer - solid</td></tr>
+        <tr><td><code>3</code></td><td>Rock</td><td>Dark Gray</td><td>Deep layer - solid</td></tr>
+        <tr><td><code>4</code></td><td>Stone</td><td>Light Gray</td><td>Deep layer - solid</td></tr>
+        <tr><td><code>5</code></td><td>Sand</td><td>Yellow</td><td>Special terrain - solid</td></tr>
+        <tr><td><code>6</code></td><td>Water</td><td>Cyan</td><td>Liquid terrain - solid</td></tr>
+    </table>
+
+    <h2>Generation Types</h2>
+
+    <h3>Type 1: Flat Generation</h3>
+    <p>Creates a simple flat terrain at the bottom half of the map. Randomly assigns grass or dirt blocks below the mid-point.</p>
+
+    <h3>Type 2: Natural Generation</h3>
+    <p>Creates natural terrain using Perlin noise:</p>
+    <ul>
+        <li><strong>Surface Scale (0.02):</strong> Controls terrain height variation</li>
+        <li><strong>Cave Scale (0.05):</strong> Controls cave size and frequency</li>
+        <li><strong>Ground Level:</strong> Determined by Perlin noise offset by 50% of map height</li>
+        <li><strong>Layers:</strong>
+            <ul>
+                <li>Top 1 block: Grass (surface)</li>
+                <li>Next 4 blocks: Dirt (shallow)</li>
+                <li>Below that: Stone (deep)</li>
+            </ul>
+        </li>
+        <li><strong>Caves:</strong> Created where cave noise exceeds 0.68 threshold</li>
+    </ul>
+
+    <div class="note">
+        <strong>Note:</strong> The random values are generated each call using <code>Math.random()</code>. For reproducible maps, you would need to fix the seed values in the generation logic.
+    </div>
+
+    <h2>See Also</h2>
+    <ul class="see">
+        <li><code>PerlinNoise</code> - Noise generation algorithm</li>
+        <li><code>Player</code> - Player entity that uses the map</li>
+        <li><code>GraphicEngine</code> - Rendering system that displays the map</li>
+    </ul>
+</body>
+</html>
